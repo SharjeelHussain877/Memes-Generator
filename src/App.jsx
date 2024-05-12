@@ -35,13 +35,23 @@ function App() {
   const [selectedMemesId, setSelectedMemesId] = useState("181913649")
   const [currentMemes, setCurrentMemes] = useState({})
   const [memesText, setMemesText] = useState([]);
+  const [loader, setLoader] = useState(false);
+  const [loader2, setLoader2] = useState(false);
+
 
   async function get() {
+    setLoader(true)
+    setLoader2(true)
     try {
       const response = await axios.get("https://api.imgflip.com/get_memes")
       const result = await response.data.data
       setRes(result)
+      setLoader2(false)
+      setLoader(false)
+      setCurrentMemes(result.memes[0])
+      setLoader2(false)
     } catch (error) {
+      setLoader(false)
       console.log(error)
     }
   }
@@ -49,13 +59,15 @@ function App() {
 
 
   async function post(memesId, texts) {
+    setLoader(true)
     try {
       const textParams = texts.map((text, index) => `text${index}=${encodeURIComponent(text)}`).join('&');
-
       const response = await axios.post(`https://api.imgflip.com/caption_image?template_id=${memesId}&username=${"sharjeelhussain"}&password=${"Sharjeel@192"}&${textParams}`);
       const result = await response.data;
       setGeneratedMemes(result);
+      setLoader(false)
     } catch (error) {
+      setLoader(false)
       console.log(error);
     }
   }
@@ -75,7 +87,6 @@ function App() {
     setSelectedMemesId(id)
     setMemesText([]);
   }
-
 
   const handleTextChange = (index, value) => {
     setMemesText((prevText) => {
@@ -97,40 +108,54 @@ function App() {
 
   return (
     <Container style={{ minHeight: "100vh", backgroundColor: "#fff" }} className='py-8'>
-      <Row xs={1} md={2} className="g-4">
-        <Col >
-          <Card>
-            {/* <Card.Img variant="top" src="holder.js/100px160" /> */}
-            <Card.Body>
-              <Card.Title className='text-80px'>{currentMemes && currentMemes.name}</Card.Title>
-              <div style={{ width: "100%", minHeight: "auto" }} >
-                <Image src={generatedMemes.success ? generatedMemes.data.url : (currentMemes ? currentMemes.url : "https://www.invoicera.com/wp-content/uploads/2023/11/default-image.jpg")}
-                  rounded className='w-100 sm:w-auto h-fit sm:h-auto' />
+      <Row xs={1} sm={2} className="g-4">
+        <Col>
+          {
+            loader ? (
+              <div className='d-flex justify-content-center align-items-center h-[90vh]'>
+                <div class="loader"></div>
               </div>
-              <Card.Text className='flex justify-end'>
-                <Button onClick={handleDownload} className="mt-2 bg-[#3e95ff]" as="a" variant="primary">
-                  Save memes
-                </Button>
-              </Card.Text>
-            </Card.Body>
-          </Card>
+            ) : (
+              <>
+                <Card style={{ height: "80vh" }}>
+                  <Card.Body>
+                    <Card.Title className='text-80px'>{currentMemes.name}</Card.Title>
+                    <div style={{ width: "100%", height: "60vh" }} >
+                      <Image src={generatedMemes.success ? generatedMemes.data.url : (currentMemes ? currentMemes.url : "https://www.invoicera.com/wp-content/uploads/2023/11/default-image.jpg")}
+                        rounded className='h-[60vh] object-contain' />
+                    </div>
+                    <Card.Text className=''>
+                      <Button onClick={handleDownload} className="mt-2 bg-[#3e95ff] w-100" as="a" variant="primary">
+                        Save memes
+                      </Button>
+                    </Card.Text>
+                  </Card.Body>
+                </Card>
+              </>
+            )
+          }
         </Col>
         <Col>
-          <Card style={{ maxWidth: "100%" }}>
-            {/* <Card.Img variant="top" src="holder.js/100px160" /> */}
-            <Card.Body>
+          <Card style={{ width: "100%", height: "100%" }}>
+            <Card.Body className="">
               <Card.Title className='text-[#3e95ff]'>
                 Memes Generator
               </Card.Title>
               <Card.Title className='overflow-hidden'>
-                <div className='overflow-x-scroll h-20 flex w-100'>
-                  {Array.isArray(res.memes) && res.memes.map(element => (
-                    <Image onClick={() => memesId(element.id)} src={element.url} alt="memes-images" className='w-20 mx-2 h-auto' key={element.id} />
-                  ))}
+                <div className='overflow-x-scroll h-20 flex w-100 images'>
+                  {loader2 ? (
+                    <div className='d-flex justify-content-center align-items-center w-100'>
+                      <div class="loader"></div>
+                    </div>
+                  ) : (
+                    Array.isArray(res.memes) && res.memes.map(element => (
+                      <Image onClick={() => memesId(element.id)} src={element.url} alt="memes-images" className='w-20 mx-2 h-auto mb-2 option-image' key={element.id} />
+                    ))
+                  )}
                 </div>
-
               </Card.Title>
-              <Card.Title>
+              <Card.Title className=''>
+                <h5 className='mt-4'>Type your text for generate memes</h5>
                 {currentMemes && [...Array(currentMemes.box_count)].map((_, index) => (
                   <Form.Control
                     className='mt-2' type="text"
@@ -141,6 +166,7 @@ function App() {
                 ))}
               </Card.Title>
             </Card.Body>
+
           </Card>
         </Col>
       </Row>

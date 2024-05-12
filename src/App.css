@@ -1,0 +1,51 @@
+::-webkit-scrollbar {
+  width: 10px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+  cursor: grabbing;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.images > * {
+  cursor: pointer;
+  transform: scale(1);
+  transition: all 0.3s ease;
+}
+
+.images > *:hover {
+  cursor: pointer;
+  transform: scale(1.08);
+  opacity: 1;
+}
+
+.images:hover > *:not(:hover) {
+  opacity: 0.4;
+}
+
+
+/* loader animation  */
+
+/* HTML: <div class="loader"></div> */
+.loader {
+    width: 40px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #f03355;
+    clip-path: polygon(0 0,100% 0,100% 100%,0 100%);
+    animation: l1 2s infinite cubic-bezier(0.3,1,0,1);
+  }
+  @keyframes l1 {
+    33% {border-radius: 0;background: #514b82 ;clip-path: polygon(0 0,100% 0,100% 100%,0 100%)}
+    66% {border-radius: 0;background: #ffa516 ;clip-path: polygon(50% 0,50% 0,100% 100%,0 100%)}
+  }
